@@ -34,6 +34,18 @@ class BaseModel:
             session.rollback()
             raise
 
+    def delete(self):
+        """ delete the current instance """
+
+        session = Session()
+
+        try:
+            session.delete(self)
+            session.commit()
+        except:
+            session.rollback()
+            raise
+
 
 metadata = sa.MetaData()
 Base = declarative_base(cls=BaseModel, metadata=metadata)
