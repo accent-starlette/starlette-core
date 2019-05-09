@@ -22,6 +22,18 @@ class BaseModel:
     # using the current session. Equivalent to ``db.session.query(Model)``
     query: Query = None
 
+    def save(self):
+        """ save the current instance """
+
+        session = Session()
+
+        try:
+            session.add(self)
+            session.commit()
+        except:
+            session.rollback()
+            raise
+
 
 metadata = sa.MetaData()
 Base = declarative_base(cls=BaseModel, metadata=metadata)
