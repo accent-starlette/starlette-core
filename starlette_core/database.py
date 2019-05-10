@@ -1,9 +1,14 @@
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.orm import Query, scoped_session, sessionmaker
 
 
-class BaseModel:
+metadata = sa.MetaData()
+Session = scoped_session(sessionmaker())
+
+
+@as_declarative(metadata=metadata)
+class Base:
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
@@ -45,11 +50,6 @@ class BaseModel:
         except:
             session.rollback()
             raise
-
-
-metadata = sa.MetaData()
-Base = declarative_base(cls=BaseModel, metadata=metadata)
-Session = scoped_session(sessionmaker())
 
 
 class Database:
