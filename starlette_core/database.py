@@ -1,10 +1,21 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.orm import Query, scoped_session, sessionmaker
+from starlette.exceptions import HTTPException
 
 
 metadata = sa.MetaData()
 Session = scoped_session(sessionmaker())
+
+
+class BaseQuery(Query):
+    def get_or_404(self, ident):
+        """ performs a query.get or raises a 404 if not found """
+
+        qs = self.get(ident)
+        if not qs:
+            raise HTTPException(status_code=404)
+        return qs
 
 
 @as_declarative(metadata=metadata)
@@ -25,7 +36,7 @@ class Base:
 
     # Convenience property to query the database for instances of this model
     # using the current session. Equivalent to ``db.session.query(Model)``
-    query: Query = None
+    query: BaseQuery = None
 
     def save(self):
         """ save the current instance """
@@ -60,7 +71,7 @@ class Database:
         self.engine = sa.create_engine(url)
         Session.configure(bind=self.engine)
         # setup the model.query property
-        Base.query = Session.query_property()
+        Base.query = Session.query_property(query_cls=BaseQuery)
 
     def create_all(self) -> None:
         metadata.create_all(self.engine)
