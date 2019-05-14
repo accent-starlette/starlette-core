@@ -68,7 +68,8 @@ setup(
         'sqlalchemy',
         'sqlalchemy-utils',
         'starlette',
-        'typing'
+        'typing',
+        'typesystem'
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
