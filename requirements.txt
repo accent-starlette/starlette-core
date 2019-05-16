@@ -6,6 +6,7 @@
 autoflake
 black
 isort
+mock
 mypy
 pytest
 pytest-cov
