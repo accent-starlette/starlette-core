@@ -1,4 +1,5 @@
 import typing
+
 import typesystem
 from typesystem.unique import Uniqueness
 
@@ -6,13 +7,13 @@ from typesystem.unique import Uniqueness
 class Email(typesystem.String):
     """ A field that validates an email """
 
-    custom_errors = {
-        'pattern': 'Must be a valid email.'
-    }
+    custom_errors = {"pattern": "Must be a valid email."}
 
     def __init__(self, **kwargs: typing.Any) -> None:
-        kwargs.setdefault('pattern', r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)')
-        kwargs.setdefault('format', 'email')
+        kwargs.setdefault(
+            "pattern", r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+        )
+        kwargs.setdefault("format", "email")
         self.errors.update(self.custom_errors)
         super().__init__(**kwargs)
 
@@ -29,7 +30,7 @@ class IntegerChoice(typesystem.Choice):
         "null": "May not be null.",
         "required": "This field is required.",
         "choice": "Not a valid choice.",
-        "integer": "Not a valid integer"
+        "integer": "Not a valid integer",
     }
 
     def __init__(

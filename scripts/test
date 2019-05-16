@@ -1,0 +1,8 @@
+#!/bin/sh -e
+
+set -x
+
+pytest --cov=starlette_core --cov-report html
+mypy starlette_core --ignore-missing-imports
+autoflake --recursive --remove-unused-variables starlette_core tests
+black starlette_core tests --check

@@ -1,3 +1,6 @@
+<a href="https://travis-ci.org/accent-starlette/starlette-core">
+    <img src="https://travis-ci.org/accent-starlette/starlette-core.svg?branch=master" alt="Build Status">
+</a>
 
 ---
 

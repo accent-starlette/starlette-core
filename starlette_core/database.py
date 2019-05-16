@@ -3,7 +3,6 @@ from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.orm import Query, scoped_session, sessionmaker
 from starlette.exceptions import HTTPException
 
-
 metadata = sa.MetaData()
 Session = scoped_session(sessionmaker())
 
@@ -25,7 +24,7 @@ class Base:
         return cls.__name__.lower()
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}, id={self.id}>'
+        return f"<{self.__class__.__name__}, id={self.id}>"
 
     def __str__(self):
         return self.__repr__()
@@ -36,7 +35,7 @@ class Base:
 
     # Convenience property to query the database for instances of this model
     # using the current session. Equivalent to ``db.session.query(Model)``
-    query: BaseQuery = None
+    query: BaseQuery
 
     def save(self):
         """ save the current instance """

@@ -1,7 +1,6 @@
-import smtplib
-
-from email.message import EmailMessage
 import email.utils
+import smtplib
+from email.message import EmailMessage
 
 from .config import config
 
@@ -9,8 +8,8 @@ from .config import config
 def send_message(msg: EmailMessage):
     """ Send an ``email.message.EmailMessage``. """
 
-    if not msg.get('From'):
-        msg['From'] = email.utils.formataddr(
+    if not msg.get("From"):
+        msg["From"] = email.utils.formataddr(
             (config.email_default_from_name, config.email_default_from_address)
         )
 

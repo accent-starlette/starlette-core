@@ -1,0 +1,11 @@
+# Package
+
+-e .
+
+# Testing
+autoflake
+black
+isort
+mypy
+pytest
+pytest-cov
