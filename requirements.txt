@@ -10,3 +10,4 @@ mock
 mypy
 pytest
 pytest-cov
+requests

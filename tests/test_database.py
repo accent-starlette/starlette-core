@@ -1,18 +1,14 @@
 import pytest
 from starlette.exceptions import HTTPException
 
-from starlette_core.database import Base, Database, DatabaseURL, Session
+from starlette_core.database import Base, Session
 
 
 class User(Base):
     pass
 
 
-url = DatabaseURL("sqlite://")
-db = Database(url)
-
-
-def test_database():
+def test_database(db):
     # connects ok
     db.engine.connect()
 
@@ -25,7 +21,7 @@ def test_database():
     assert [] == db.engine.table_names()
 
 
-def test_session():
+def test_session(db):
     db.create_all()
 
     # basic session usage
@@ -35,7 +31,7 @@ def test_session():
     session.close()
 
 
-def test_declarative_base():
+def test_declarative_base(db):
     db.create_all()
 
     # save
