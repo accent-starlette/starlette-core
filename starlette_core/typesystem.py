@@ -1,7 +1,13 @@
+import decimal
 import typing
 
 import typesystem
 from typesystem.unique import Uniqueness
+
+
+class Decimal(typesystem.Decimal):
+    def serialize(self, obj: typing.Any) -> typing.Any:
+        return decimal.Decimal(obj) if obj is not None else None
 
 
 class Email(typesystem.String):
@@ -16,6 +22,11 @@ class Email(typesystem.String):
         kwargs.setdefault("format", "email")
         self.errors.update(self.custom_errors)
         super().__init__(**kwargs)
+
+
+class Float(typesystem.Float):
+    def serialize(self, obj: typing.Any) -> typing.Any:
+        return float(obj) if obj is not None else None
 
 
 class IntegerChoice(typesystem.Choice):

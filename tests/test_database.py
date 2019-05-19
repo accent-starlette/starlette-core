@@ -14,7 +14,7 @@ def test_database(db):
 
     # can create tables
     db.create_all()
-    assert ["user"] == db.engine.table_names()
+    assert "user" in db.engine.table_names()
 
     # can drop tables
     db.drop_all()
