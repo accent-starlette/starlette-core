@@ -2,6 +2,7 @@ import decimal
 import typing
 
 import typesystem
+from sqlalchemy import orm
 from typesystem.unique import Uniqueness
 
 
@@ -71,3 +72,34 @@ class IntegerChoice(typesystem.Choice):
             raise self.validation_error("choice")
 
         return value
+
+
+class ModelChoice(typesystem.Choice):
+    def __init__(self, *, queryset: orm.Query, **kwargs: typing.Any) -> None:
+        super().__init__(**kwargs)
+        self.queryset = queryset
+        self.choices = [(o.id, str(o)) for o in self.queryset]
+
+    @property
+    def choices(self):
+        return self.__choices
+
+    @choices.setter
+    def choices(self, choices):
+        self.__choices = choices
+
+    def validate(self, value: typing.Any, *, strict: bool = False) -> typing.Any:
+        if value is None and self.allow_null:
+            return None
+        elif value == "" and self.allow_null:
+            return None
+        elif value == "":
+            raise self.validation_error("required")
+        elif value is None:
+            raise self.validation_error("null")
+
+        try:
+            instance = self.queryset.filter_by(id=value).one()
+            return instance.id
+        except orm.exc.NoResultFound:
+            raise self.validation_error("choice")
