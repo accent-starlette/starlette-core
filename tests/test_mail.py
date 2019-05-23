@@ -1,6 +1,7 @@
 from email.message import EmailMessage
 
 from mock import call, patch
+
 from starlette_core import config
 from starlette_core.mail import send_message
 
