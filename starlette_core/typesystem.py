@@ -30,19 +30,21 @@ class Float(typesystem.Float):
         return float(obj) if obj is not None else None
 
 
-class ModelChoice(typesystem.Choice):
+class ModelChoice(typesystem.Field):
+    errors = {
+        "null": "May not be null.",
+        "required": "This field is required.",
+        "choice": "Not a valid choice.",
+    }
+    queryset: orm.Query
+
     def __init__(self, *, queryset: orm.Query, **kwargs: typing.Any) -> None:
         super().__init__(**kwargs)
         self.queryset = queryset
-        self.choices = [(o.id, str(o)) for o in self.queryset]
 
     @property
     def choices(self):
-        return self.__choices
-
-    @choices.setter
-    def choices(self, choices):
-        self.__choices = choices
+        return [(o.id, str(o)) for o in self.queryset]
 
     def validate(self, value: typing.Any, *, strict: bool = False) -> typing.Any:
         if value is None and self.allow_null:
@@ -54,6 +56,7 @@ class ModelChoice(typesystem.Choice):
         elif value is None:
             raise self.validation_error("null")
 
+        # just make sure the record still exists in the db
         try:
             instance = self.queryset.filter_by(id=value).one()
             return instance.id

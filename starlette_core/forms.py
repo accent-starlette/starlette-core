@@ -2,9 +2,15 @@ import typing
 
 import typesystem
 
+from .typesystem import ModelChoice
+
 
 class Form(typesystem.forms.Form):
-    pass
+    def template_for_field(self, field: typesystem.fields.Field) -> str:
+        template = super().template_for_field(field)
+        if isinstance(field, ModelChoice):
+            return "forms/select.html"
+        return template
 
 
 class Jinja2Forms(typesystem.forms.Jinja2Forms):
