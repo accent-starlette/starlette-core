@@ -30,50 +30,6 @@ class Float(typesystem.Float):
         return float(obj) if obj is not None else None
 
 
-class IntegerChoice(typesystem.Choice):
-    """
-    A choice field that allows its choices to be integers
-    Example: choices = [(1, "One"), (2, "Two")]
-    """
-
-    errors = {
-        "null": "May not be null.",
-        "required": "This field is required.",
-        "choice": "Not a valid choice.",
-    }
-
-    def __init__(
-        self,
-        *,
-        choices: typing.Sequence[typing.Union[int, typing.Tuple[int, str]]] = None,
-        **kwargs: typing.Any,
-    ) -> None:
-        super().__init__(**kwargs)
-        self.choices = [
-            (choice if isinstance(choice, (tuple, list)) else (choice, choice))
-            for choice in choices or []
-        ]
-        assert all(len(choice) == 2 for choice in self.choices)
-
-    def validate(self, value: typing.Any, *, strict: bool = False) -> typing.Any:
-        if value is None and self.allow_null:
-            return None
-        if value == "" and self.allow_null and not strict:
-            return None
-        elif value == "":
-            raise self.validation_error("required")
-        elif value is None:
-            raise self.validation_error("null")
-
-        if isinstance(value, str) and value.isdigit() and not strict:
-            value = int(value)
-
-        if value not in Uniqueness([key for key, value in self.choices]):
-            raise self.validation_error("choice")
-
-        return value
-
-
 class ModelChoice(typesystem.Choice):
     def __init__(self, *, queryset: orm.Query, **kwargs: typing.Any) -> None:
         super().__init__(**kwargs)
