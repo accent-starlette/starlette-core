@@ -4,8 +4,8 @@ import typesystem
 from typesystem.fields import FORMATS
 
 from .database import Base
+from .fields import Decimal, Email, Float
 from .formats import DateFormat, DateTimeFormat, TimeFormat
-from .typesystem import Decimal, Email, Float
 
 FORMATS.update(
     {"date": DateFormat(), "datetime": DateTimeFormat(), "time": TimeFormat()}

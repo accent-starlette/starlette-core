@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from typesystem.base import ValidationError
 
 from starlette_core.database import Base, Session
-from starlette_core.typesystem import Email, ModelChoice
+from starlette_core.fields import Email, ModelChoice
 
 
 def test_email():

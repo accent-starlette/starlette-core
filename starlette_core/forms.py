@@ -2,7 +2,7 @@ import typing
 
 import typesystem
 
-from .typesystem import ModelChoice
+from .fields import ModelChoice
 
 
 class Form(typesystem.forms.Form):
