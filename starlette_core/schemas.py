@@ -95,7 +95,10 @@ class ModelSchemaGenerator:
                 new_field = cls.type_mapping[column_type_class]
 
                 # get the fields defaults by mapping attributes from sqlalchemy
-                field_kwargs = {"allow_null": column.nullable}
+                field_kwargs = {
+                    "allow_null": column.nullable,
+                    "title": field.replace("_", " ").title(),
+                }
 
                 if column_type_class in ["String", "Text", "Unicode", "UnicodeText"]:
                     field_kwargs["allow_blank"] = column.nullable
