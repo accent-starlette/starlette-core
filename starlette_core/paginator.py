@@ -71,7 +71,8 @@ class Paginator:
         c = getattr(self.object_list, "count", None)
         if callable(c) and not inspect.isbuiltin(c) and method_has_no_args(c):
             self._count = c()
-        self._count = len(self.object_list)
+        else:
+            self._count = len(self.object_list)
 
         return self._count
 

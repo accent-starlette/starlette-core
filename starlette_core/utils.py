@@ -1,3 +1,6 @@
+import inspect
+
+
 def method_has_no_args(meth):
     """Return True if a method only accepts 'self'."""
 
