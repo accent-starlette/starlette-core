@@ -68,8 +68,7 @@ setup(
         'sqlalchemy',
         'sqlalchemy-utils',
         'starlette',
-        'typing',
-        'typesystem @ git+https://github.com/accent-starlette/typesystem@master'
+        'typing'
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
