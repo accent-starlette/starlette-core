@@ -47,3 +47,11 @@ def assert_model_field(
 
     if length:
         assert field.type.length == length
+
+
+class DummyPostData(dict):
+    def getlist(self, key):
+        v = self[key]
+        if not isinstance(v, (list, tuple)):
+            v = [v]
+        return v
