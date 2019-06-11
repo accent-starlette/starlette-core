@@ -1,6 +1,15 @@
 __version__ = "0.0.1.b1"
 
-from . import database, exceptions, mail, middleware, paginator, testing, utils
+from . import (
+    database,
+    exceptions,
+    mail,
+    middleware,
+    paginator,
+    templating,
+    testing,
+    utils,
+)
 from .config import config
 
 __all__ = [
@@ -10,6 +19,7 @@ __all__ = [
     "mail",
     "middleware",
     "paginator",
+    "templating",
     "testing",
     "utils",
 ]

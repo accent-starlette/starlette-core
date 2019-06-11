@@ -6,6 +6,7 @@
 autoflake
 black
 isort
+jinja2
 mock
 mypy
 pytest
