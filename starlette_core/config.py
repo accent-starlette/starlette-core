@@ -11,6 +11,7 @@ class AppConfig:
     email_username: str = ""
     email_password: typing.Union[str, Secret] = ""
     email_use_tls: bool = False
+    jinja2_extensions: typing.List[str] = []
 
 
 config = AppConfig()

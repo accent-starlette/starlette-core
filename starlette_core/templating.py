@@ -3,6 +3,8 @@ import typing
 from starlette import templating
 from starlette.datastructures import QueryParams
 
+from .config import config
+
 try:
     import jinja2
 except ImportError:  # pragma: nocover
@@ -25,7 +27,9 @@ class Jinja2Templates(templating.Jinja2Templates):
             request = context["request"]
             return request.url_for(name, **path_params)
 
-        env = jinja2.Environment(loader=loader, autoescape=True)
+        env = jinja2.Environment(
+            extensions=config.jinja2_extensions, loader=loader, autoescape=True
+        )
         env.globals["url_params_update"] = url_params_update
         env.globals["url_for"] = url_for
 

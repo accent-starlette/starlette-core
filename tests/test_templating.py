@@ -1,8 +1,8 @@
 from os.path import dirname, join, realpath
 
 import jinja2
-
 from starlette import templating
+
 from starlette_core.templating import Jinja2Templates
 
 templates_directory = join(dirname(realpath(__file__)), "templates")
