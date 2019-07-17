@@ -1,4 +1,31 @@
-from starlette.types import Scope, Receive, Send
+import threading
+
+from starlette.types import Receive, Scope, Send
+
+request_local = threading.local()
+
+
+def get_request():
+    return getattr(request_local, "request", None)
+
+
+class CurrentRequestMiddleware:
+    """
+    Populates the current request on a thread so that a model has
+    access to the user outside of a view.
+    """
+
+    def __init__(self, app) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] not in ("http", "websocket"):  # pragma: no cover
+            await self.app(scope, receive, send)
+            return
+
+        request_local.request = scope
+
+        await self.app(scope, receive, send)
 
 
 class DatabaseMiddleware:
@@ -11,12 +38,14 @@ class DatabaseMiddleware:
     def __init__(self, app) -> None:
         self.app = app
 
-    def cleanup_session(self):
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] not in ("http", "websocket"):  # pragma: no cover
+            await self.app(scope, receive, send)
+            return
+
         from .database import Session
 
         if Session.registry.has():
             Session.remove()
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        self.cleanup_session()
         await self.app(scope, receive, send)
