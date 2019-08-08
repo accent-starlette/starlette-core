@@ -6,6 +6,7 @@
 autoflake
 black
 isort
+itsdangerous
 jinja2
 mock
 mypy

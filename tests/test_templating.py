@@ -14,7 +14,11 @@ def test_inheritance():
 
 
 def test_templates_loaded():
-    assert templates.env.list_templates() == ["test1.html", "test2.html"]
+    assert templates.env.list_templates() == [
+        "message.html",
+        "test1.html",
+        "test2.html",
+    ]
 
 
 def test_get_template():
@@ -24,5 +28,7 @@ def test_get_template():
 
 def test_env():
     assert isinstance(templates.env, jinja2.Environment)
+    assert "get_messages" in templates.env.globals
+    assert "is_multipart" in templates.env.globals
     assert "url_params_update" in templates.env.globals
     assert "url_for" in templates.env.globals

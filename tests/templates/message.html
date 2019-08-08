@@ -1,0 +1,3 @@
+{% for message in get_messages() %}
+<p class="{{ message.category }}">{{ message.message }}</p>
+{% endfor %}
