@@ -19,12 +19,8 @@ class CurrentRequestMiddleware:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] not in ("http", "websocket"):  # pragma: no cover
-            await self.app(scope, receive, send)
-            return
-
-        request_local.request = scope
-
+        if scope["type"] in ("http", "websocket"):
+            request_local.request = scope
         await self.app(scope, receive, send)
 
 
@@ -39,13 +35,9 @@ class DatabaseMiddleware:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] not in ("http", "websocket"):  # pragma: no cover
-            await self.app(scope, receive, send)
-            return
+        if scope["type"] in ("http", "websocket"):
+            from .database import Session
 
-        from .database import Session
-
-        if Session.registry.has():
-            Session.remove()
-
+            if Session.registry.has():
+                Session.remove()
         await self.app(scope, receive, send)
