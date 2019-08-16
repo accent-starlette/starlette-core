@@ -57,3 +57,14 @@ def test_declarative_base(db):
     # delete
     user.delete()
     assert User.query.get(user.id) is None
+
+
+def test_truncate_of_db(db):
+    user = User()
+    user.save()
+
+    assert User.query.count() == 1
+
+    db.truncate_all(force=True)
+
+    assert User.query.count() == 0

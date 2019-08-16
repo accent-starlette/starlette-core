@@ -1,9 +1,11 @@
+import contextlib
 import typing
 from urllib.parse import SplitResult, parse_qsl, urlsplit
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.orm import Query, scoped_session, sessionmaker
+from starlette.config import environ
 from starlette.exceptions import HTTPException
 
 metadata = sa.MetaData()
@@ -80,6 +82,22 @@ class Database:
 
     def drop_all(self) -> None:
         metadata.drop_all(self.engine)
+
+    def truncate_all(self, force: bool = False):
+        if not (environ.get("TESTING") == "TRUE" or force):
+            raise Exception("can only truncate while testing or set to force")
+
+        if not self.engine:
+            raise Exception("no engine configured")
+
+        with contextlib.closing(self.engine.connect()) as conn:
+            trans = conn.begin()
+            for table in reversed(metadata.sorted_tables):
+                try:
+                    conn.execute(table.delete())
+                except:
+                    pass
+            trans.commit()
 
 
 class _EmptyNetloc(str):

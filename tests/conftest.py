@@ -8,4 +8,5 @@ database = Database(url)
 
 @pytest.fixture()
 def db():
-    return database
+    yield database
+    database.truncate_all(force=True)
