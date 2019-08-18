@@ -70,9 +70,9 @@ class Base:
 class Database:
     engine = None
 
-    def __init__(self, url: "DatabaseURL") -> None:
+    def __init__(self, url: "DatabaseURL", engine_kwargs: dict = {}) -> None:
         # configure the engine
-        self.engine = sa.create_engine(str(url))
+        self.engine = sa.create_engine(str(url), **engine_kwargs)
         Session.configure(bind=self.engine)
         # setup the model.query property
         Base.query = Session.query_property(query_cls=BaseQuery)
