@@ -2,6 +2,8 @@ import threading
 
 from starlette.types import Receive, Scope, Send
 
+from .database import Session
+
 request_local = threading.local()
 
 
@@ -36,8 +38,8 @@ class DatabaseMiddleware:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] in ("http", "websocket"):
-            from .database import Session
-
+            request = await self.app(scope, receive, send)
             if Session.registry.has():
                 Session.remove()
+            return request
         await self.app(scope, receive, send)
