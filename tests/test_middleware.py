@@ -3,16 +3,18 @@ from starlette.responses import JSONResponse
 from starlette.testclient import TestClient
 
 from starlette_core.database import Session
-from starlette_core.middleware import DatabaseMiddleware
+from starlette_core.middleware import DatabaseMiddleware, get_request_id
 
 
 def session_initialized(request):
     Session()
-    return JSONResponse({"has_session": Session.registry.has()})
+    has_session = get_request_id() in Session.registry.registry
+    return JSONResponse({"has_session": has_session, "id": get_request_id()})
 
 
 def session_not_initialized(request):
-    return JSONResponse({"has_session": Session.registry.has()})
+    has_session = get_request_id() in Session.registry.registry
+    return JSONResponse({"has_session": has_session, "id": get_request_id()})
 
 
 def create_app():
@@ -27,11 +29,15 @@ def test_database_middleware(db):
     # by not initializing it doesnt break
     with TestClient(create_app()) as client:
         response = client.get("/session_not_initialized")
-        assert response.json() == {"has_session": False}
-    assert not Session.registry.has()
+        json = response.json()
+        assert not json["has_session"]
+        assert json["id"] is not None
+        assert json["id"] not in Session.registry.registry
 
     # sessions are removed after the request
     with TestClient(create_app()) as client:
         response = client.get("/session_initialized")
-        assert response.json() == {"has_session": True}
-    assert not Session.registry.has()
+        json = response.json()
+        assert json["has_session"]
+        assert json["id"] is not None
+        assert json["id"] not in Session.registry.registry

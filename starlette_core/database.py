@@ -8,8 +8,10 @@ from sqlalchemy.orm import Query, scoped_session, sessionmaker
 from starlette.config import environ
 from starlette.exceptions import HTTPException
 
+from .middleware import get_request_id
+
 metadata = sa.MetaData()
-Session = scoped_session(sessionmaker())
+Session = scoped_session(sessionmaker(), scopefunc=get_request_id)
 
 
 class BaseQuery(Query):

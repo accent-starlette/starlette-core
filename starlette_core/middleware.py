@@ -1,45 +1,80 @@
-import threading
+from contextvars import ContextVar
+from uuid import uuid4
 
-from starlette.types import Receive, Scope, Send
+from starlette.types import ASGIApp, Receive, Scope, Send
 
-from .database import Session
+_request_id_ctx_var: ContextVar[str] = ContextVar(  # type: ignore
+    "request_id", default=None
+)
 
-request_local = threading.local()
+
+_request_ctx_var: ContextVar[Scope] = ContextVar(  # type: ignore
+    "request", default=None
+)
 
 
-def get_request():
-    return getattr(request_local, "request", None)
+def get_request_id() -> str:
+    return _request_id_ctx_var.get()
+
+
+def get_request() -> Scope:
+    return _request_ctx_var.get()
 
 
 class CurrentRequestMiddleware:
     """
-    Populates the current request on a thread so that a model has
-    access to the user outside of a view.
+    Sets the _request_ctx_var to the request.
+
+    Usage:
+        from starlette_core.middleware import get_request
+        get_request()
     """
 
-    def __init__(self, app) -> None:
+    def __init__(self, app: ASGIApp) -> None:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] in ("http", "websocket"):
-            request_local.request = scope
-        await self.app(scope, receive, send)
+        if scope["type"] not in ("http", "websocket"):
+            await self.app(scope, receive, send)
+            return
+
+        local_scope = _request_ctx_var.set(scope)
+
+        response = await self.app(scope, receive, send)
+
+        _request_ctx_var.reset(local_scope)
+
+        return response
 
 
 class DatabaseMiddleware:
     """
-    Remove the current db session so it doesnt live between
-    requests. This should be added after all middleware
-    that requires db access have been added.
+    Sets the _request_id_ctx_var to a new uuid. This inturn is used
+    by the `starlette_core.database.Session` object to isolate the
+    session between requests.
+
+    Usage:
+        from starlette_core.middleware import get_request_id
+        get_request_id()
     """
 
-    def __init__(self, app) -> None:
+    def __init__(self, app: ASGIApp) -> None:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] in ("http", "websocket"):
-            request = await self.app(scope, receive, send)
-            if Session.registry.has():
-                Session.remove()
-            return request
-        await self.app(scope, receive, send)
+        if scope["type"] not in ("http", "websocket"):
+            await self.app(scope, receive, send)
+            return
+
+        request_id = _request_id_ctx_var.set(str(uuid4()))
+
+        response = await self.app(scope, receive, send)
+
+        from .database import Session
+
+        if Session.registry.has():
+            Session.remove()
+
+        _request_id_ctx_var.reset(request_id)
+
+        return response
