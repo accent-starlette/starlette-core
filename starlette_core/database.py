@@ -68,6 +68,11 @@ class Base:
             session.rollback()
             raise
 
+    def refresh_from_db(self):
+        """ Refresh the current instance from the database """
+
+        sa.inspect(self).session.refresh(self)
+
 
 class Database:
     engine = None
