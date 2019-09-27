@@ -45,7 +45,7 @@ class Base:
     # using the current session. Equivalent to ``db.session.query(Model)``
     query: BaseQuery
 
-    def save(self):
+    def save(self) -> None:
         """ save the current instance """
 
         session = Session()
@@ -57,7 +57,7 @@ class Base:
             session.rollback()
             raise
 
-    def delete(self):
+    def delete(self) -> None:
         """ delete the current instance """
 
         session = Session()
@@ -69,7 +69,7 @@ class Base:
             session.rollback()
             raise
 
-    def can_be_deleted(self):
+    def can_be_deleted(self) -> bool:
         """
         Simple helper to check if the instance has entities
         that will prevent this from being deleted via a protected foreign key.
@@ -92,7 +92,7 @@ class Base:
             return False
         return True
 
-    def refresh_from_db(self):
+    def refresh_from_db(self) -> None:
         """ Refresh the current instance from the database """
 
         sa.inspect(self).session.refresh(self)
@@ -114,7 +114,7 @@ class Database:
     def drop_all(self) -> None:
         metadata.drop_all(self.engine)
 
-    def truncate_all(self, force: bool = False):
+    def truncate_all(self, force: bool = False) -> None:
         if not (environ.get("TESTING") == "TRUE" or force):
             raise Exception("can only truncate while testing or set to force")
 
