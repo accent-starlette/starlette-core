@@ -3,13 +3,13 @@ from uuid import uuid4
 
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-_request_id_ctx_var: ContextVar[str] = ContextVar(  # type: ignore
-    "request_id", default=None
+_request_id_ctx_var: ContextVar[str] = ContextVar(
+    "request_id", default=None  # type: ignore
 )
 
 
-_request_ctx_var: ContextVar[Scope] = ContextVar(  # type: ignore
-    "request", default=None
+_request_ctx_var: ContextVar[Scope] = ContextVar(
+    "request", default=None  # type: ignore
 )
 
 
