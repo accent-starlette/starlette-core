@@ -77,6 +77,59 @@ def test_declarative_base__refresh_from_db(db):
     assert user.name == "ted"
 
 
+def test_declarative_base__can_be_deleted(db):
+    class OrderA(Base):
+        user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
+
+    class OrderB(Base):
+        user_id = sa.Column(
+            sa.Integer, sa.ForeignKey(User.id, ondelete="SET NULL"), nullable=True
+        )
+
+    class OrderC(Base):
+        user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete="CASCADE"))
+
+    class OrderD(Base):
+        user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete="RESTRICT"))
+
+    db.create_all()
+
+    user = User(name="ted")
+    user.save()
+
+    assert user.can_be_deleted()
+
+    # default
+
+    order = OrderA(user_id=user.id)
+    order.save()
+    assert not user.can_be_deleted()
+
+    order.delete()
+    assert user.can_be_deleted()
+
+    # set null
+
+    order = OrderB(user_id=user.id)
+    order.save()
+    assert user.can_be_deleted()
+
+    # cascade
+
+    order = OrderC(user_id=user.id)
+    order.save()
+    assert user.can_be_deleted()
+
+    # restrict
+
+    order = OrderD(user_id=user.id)
+    order.save()
+    assert not user.can_be_deleted()
+
+    order.delete()
+    assert user.can_be_deleted()
+
+
 def test_declarative_base__repr(db):
     db.create_all()
 

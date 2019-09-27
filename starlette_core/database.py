@@ -5,6 +5,7 @@ from urllib.parse import SplitResult, parse_qsl, urlsplit
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.orm import Query, scoped_session, sessionmaker
+from sqlalchemy_utils import dependent_objects, get_referencing_foreign_keys
 from starlette.config import environ
 from starlette.exceptions import HTTPException
 
@@ -67,6 +68,29 @@ class Base:
         except:
             session.rollback()
             raise
+
+    def can_be_deleted(self):
+        """
+        Simple helper to check if the instance has entities
+        that will prevent this from being deleted via a protected foreign key.
+        """
+
+        deps = list(
+            dependent_objects(
+                self,
+                (
+                    fk
+                    for fk in get_referencing_foreign_keys(self.__class__)
+                    # On most databases RESTRICT is the default mode hence we
+                    # check for None values also
+                    if fk.ondelete == "RESTRICT" or fk.ondelete is None
+                ),
+            ).limit(1)
+        )
+
+        if deps:
+            return False
+        return True
 
     def refresh_from_db(self):
         """ Refresh the current instance from the database """
