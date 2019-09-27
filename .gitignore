@@ -4,4 +4,5 @@
 *.pyc
 .idea
 .mypy_cache
+.vscode
 htmlcov
