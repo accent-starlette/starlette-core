@@ -9,10 +9,10 @@ from .base import BaseEmailBackend
 class EmailBackend(BaseEmailBackend):
     """ A wrapper that sends email to the console. """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, fail_silently: bool = False, **kwargs: typing.Any) -> None:
+        super().__init__(fail_silently=fail_silently)
         self.stream = kwargs.pop("stream", sys.stdout)
         self._lock = threading.RLock()
-        super().__init__(*args, **kwargs)
 
     def write_message(self, message):
         msg_data = message.as_bytes()
@@ -26,11 +26,11 @@ class EmailBackend(BaseEmailBackend):
         self.stream.write("-" * 79)
         self.stream.write("\n")
 
-    def send_messages(self, email_messages: typing.List[EmailMessage]):
-        """Write all messages to the stream in a thread-safe way."""
+    def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
+        """ Write all messages to the stream in a thread-safe way. """
 
         if not email_messages:
-            return
+            return 0
         msg_count = 0
         with self._lock:
             try:

@@ -45,7 +45,7 @@ class BaseEmailBackend:
         self.close()
         print("close", self)
 
-    def send_messages(self, email_messages: typing.List[EmailMessage]):
+    def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
         """
         Send one or more EmailMessage objects and return the number of email
         messages sent.

@@ -3,6 +3,8 @@ import threading
 import typing
 from email.message import EmailMessage
 
+from starlette.datastructures import Secret
+
 from ...config import config
 from .base import BaseEmailBackend
 
@@ -12,15 +14,15 @@ class EmailBackend(BaseEmailBackend):
 
     def __init__(
         self,
-        host=None,
-        port=None,
-        username=None,
-        password=None,
-        use_tls=None,
-        fail_silently=False,
-        timeout=None,
-        **kwargs
-    ):
+        host: typing.Optional[str] = None,
+        port: typing.Optional[int] = None,
+        username: typing.Optional[str] = None,
+        password: typing.Optional[Secret] = None,
+        use_tls: typing.Optional[bool] = None,
+        fail_silently: bool = False,
+        timeout: typing.Optional[int] = None,
+        **kwargs: typing.Any
+    ) -> None:
         super().__init__(fail_silently=fail_silently)
         self.host = host or config.email_host
         self.port = port or config.email_port
@@ -59,7 +61,7 @@ class EmailBackend(BaseEmailBackend):
                 self.connection.starttls()
 
             if self.username and self.password:
-                self.connection.login(self.username, self.password)
+                self.connection.login(self.username, str(self.password))
 
             return True
         except OSError:
@@ -71,6 +73,7 @@ class EmailBackend(BaseEmailBackend):
 
         if self.connection is None:
             return
+
         try:
             try:
                 self.connection.quit()
@@ -86,7 +89,7 @@ class EmailBackend(BaseEmailBackend):
         finally:
             self.connection = None
 
-    def send_messages(self, email_messages: typing.List[EmailMessage]):
+    def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
         """
         Send one or more EmailMessage objects and return the number of email
         messages sent.
@@ -94,6 +97,7 @@ class EmailBackend(BaseEmailBackend):
 
         if not email_messages:
             return 0
+
         with self._lock:
             new_conn_created = self.open()
             if not self.connection or new_conn_created is None:
@@ -106,10 +110,15 @@ class EmailBackend(BaseEmailBackend):
                     num_sent += 1
             if new_conn_created:
                 self.close()
+
         return num_sent
 
     def _send(self, email_message: EmailMessage):
         """A helper method that does the actual sending."""
+
+        if not self.connection:
+            # We failed silently on open(). Trying to send would be pointless.
+            return False
 
         try:
             self.connection.send_message(email_message)
@@ -117,4 +126,5 @@ class EmailBackend(BaseEmailBackend):
             if not self.fail_silently:
                 raise
             return False
+
         return True

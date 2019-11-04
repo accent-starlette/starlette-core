@@ -13,7 +13,7 @@ def get_connection(
     **kwds: typing.Any
 ):
     """Load an email backend and return an instance of it.
-    If backend is None (default), use settings.EMAIL_BACKEND.
+    If backend is None (default), use config.email_backend.
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
@@ -34,4 +34,4 @@ def send_message(
         )
 
     connection = connection or get_connection(fail_silently=fail_silently)
-    connection.send_messages([msg])
+    return connection.send_messages([msg])
