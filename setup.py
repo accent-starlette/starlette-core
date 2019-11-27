@@ -71,6 +71,12 @@ setup(
         'typing',
         'wtforms'
     ],
+    extras_require={
+        "docs": [
+            "mkdocs",
+            "mkdocs-material",
+        ]
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
