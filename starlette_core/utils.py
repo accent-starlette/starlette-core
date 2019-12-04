@@ -25,7 +25,7 @@ def import_string(dotted_path: str):
 
 
 def method_has_no_args(meth):
-    """Return True if a method only accepts 'self'."""
+    """ Return True if a method only accepts 'self'. """
 
     count = len(
         [
