@@ -5,4 +5,4 @@
 .idea
 .mypy_cache
 .vscode
-htmlcov
+coverage.xml
