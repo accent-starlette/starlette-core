@@ -10,7 +10,16 @@ edit_uri: ""
 
 nav:
     - Introduction: 'index.md'
+    - Database: 'database.md'
+    - Middleware: 'middleware.md'
+    - Templating: 'templating.md'
+    - Messages: 'messages.md'
+    - Pagination: 'pagination.md'
+    - Email: 'email.md'
+    - Configuration: 'configuration.md'
+    - Testing: 'testing.md'
 
 markdown_extensions:
+  - markdown.extensions.admonition
   - markdown.extensions.codehilite:
       guess_lang: false
