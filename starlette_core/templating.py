@@ -38,7 +38,7 @@ class Jinja2Templates(templating.Jinja2Templates):
             return QueryParams(**values)
 
         env = jinja2.Environment(
-            extensions=config.jinja2_extensions, loader=loader, autoescape=True
+            extensions=list(config.jinja2_extensions), loader=loader, autoescape=True
         )
 
         env.globals["get_messages"] = get_request_messages

@@ -1,7 +1,7 @@
 import typing
 
 from starlette.config import Config
-from starlette.datastructures import Secret
+from starlette.datastructures import CommaSeparatedStrings, Secret
 
 
 class AppConfig:
@@ -24,7 +24,9 @@ class AppConfig:
         "EMAIL_TIMEOUT", cast=int, default=None
     )
     # templating configuration
-    jinja2_extensions: typing.List[str] = []
+    jinja2_extensions: typing.List[str] = _config(
+        "JINJA2_EXTENSIONS", cast=CommaSeparatedStrings, default=[]
+    )
 
 
 config = AppConfig()

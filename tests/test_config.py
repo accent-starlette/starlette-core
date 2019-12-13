@@ -11,4 +11,3 @@ def test_defaults():
     assert str(config.email_password) == ""
     assert config.email_use_tls is False
     assert config.email_timeout is None
-    assert config.jinja2_extensions == []
