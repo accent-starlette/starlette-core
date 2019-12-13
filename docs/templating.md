@@ -31,4 +31,4 @@ async def home(self, request):
 [Extensions](https://jinja.palletsprojects.com/en/2.10.x/extensions/) can be added by providing 
 configuration to this package.
 
-[See docs](/configuration).
+[See docs](../configuration).

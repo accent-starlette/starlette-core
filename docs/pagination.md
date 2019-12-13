@@ -2,7 +2,7 @@
 
 With starlette-core we include a global `Paginator` class for the project.
 
-This will support spliting data across multiple pages, auto-generating page numbers and calling a page via it's numerator. Allowing the use of **“Previous/Next”** links in a template.
+This will support splitting data across multiple pages, auto-generating page numbers and calling a page via it's numerator. Allowing the use of **“Previous/Next”** links in a template.
 
 By passing Paginator a list of objects, plus the number of items you’d like to have on each page, it provides you with methods for accessing the items for each page:
 

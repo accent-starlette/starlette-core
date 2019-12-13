@@ -41,7 +41,7 @@ Details of the different email backends are provided below.
 The `starlette_core.mail.backends.smtp.EmailBackend` (which is the default). This will send 
 an email using Python's base email modules.
 
-This does require several default configuration options. [See docs](/configuration).
+This does require several default configuration options. [See docs](../configuration).
 
 ### Console backend
 

@@ -155,4 +155,4 @@ except:
 !!! warning "Using the `DatabaseMiddleware`"
 
     If you are using the database functionality provided by this package it is important to use the middleware to correctly handle sessions.
-    [See docs](/middleware).
+    [See docs](../middleware).
