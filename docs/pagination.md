@@ -4,7 +4,7 @@ With starlette-core we include a global `Paginator` class for the project.
 
 This will support spliting data across multiple pages, auto-generating page numbers and calling a page via it's numerator. Allowing the use of **“Previous/Next”** links in a template.
 
-By passing Paginator a list of objects plus the number of items you’d like to have on each page, it provides you with methods for accessing the items for each page:
+By passing Paginator a list of objects, plus the number of items you’d like to have on each page, it provides you with methods for accessing the items for each page:
 
 ```python
 from starlette_core.paginator import Paginator
@@ -54,7 +54,7 @@ async def listing(request):
     return templates.TemplateResponse(template, context)
 ```
 
-In the template you will want to be able to navigate between pages which can be done by referencing `paginator` and `page`:
+In the template you will want to be able to navigate between pages. This can be achieved by referencing `paginator` and `page`:
 
 ```html
 <div>

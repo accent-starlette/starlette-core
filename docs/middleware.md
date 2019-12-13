@@ -1,6 +1,6 @@
 # Middleware
 
-There are some useful middleware included you can use as described below.
+There are some useful middleware included that you can use as described below.
 
 ## `DatabaseMiddleware`
 
@@ -27,7 +27,7 @@ app.add_middleware(DatabaseMiddleware)
 ## `CurrentRequestMiddleware`
 
 This middleware provides a useful function to get the current request object.
-This enables modules to access the likes of the current logged in user outside of the view/endpoint.
+This enables modules to access the things like the current logged in user outside of the view/endpoint.
 
 Enable the middleware:
 

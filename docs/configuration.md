@@ -6,7 +6,7 @@ Configuration should be stored in environment variables, or in a ".env" file tha
 
 ## Email
 
-Theses are for the smtp email backend.
+These are for the smtp email backend.
 
 ```bash
 EMAIL_BACKEND=starlette_core.mail.backends.smtp.EmailBackend  # default
@@ -20,7 +20,7 @@ EMAIL_USE_TLS=True
 EMAIL_TIMEOUT=5
 ```
 
-If you dont want to set these as environment variables you can also define them in code.
+If you don't want to set these as environment variables you can also define them in code.
 
 ```python
 from starlette.applications import Starlette
@@ -47,7 +47,7 @@ These are added to the template configuration.
 JINJA2_EXTENSIONS=jinja2.ext.i18n, myproject.ext.foo
 ```
 
-If you dont want to set these as environment variables you can also define them in code.
+If you don't want to set these as environment variables you can also define them in code.
 
 ```python
 from starlette.applications import Starlette

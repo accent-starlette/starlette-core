@@ -1,6 +1,6 @@
 # Email
 
-Email support is provided by default. It is built in a way of using backends which are
+Email support is provided by default. It is built to use backend strategies which are
 used to process the email.
 
 ## Sending the email
@@ -34,17 +34,17 @@ send_message(msg)
 
 ## Backends
 
-Details of the differend email backends are provided below.
+Details of the different email backends are provided below.
 
 ### SMTP backend
 
-The `starlette_core.mail.backends.smtp.EmailBackend` (which is the default). Will send 
-an email using pythons base email modules.
+The `starlette_core.mail.backends.smtp.EmailBackend` (which is the default). This will send 
+an email using Python's base email modules.
 
 This does require several default configuration options. [See docs](/configuration).
 
 ### Console backend
 
 The `starlette_core.mail.backends.console.EmailBackend` can be used to simulate sending 
-an email. All it does is prints the contents of the email to `sys.stdout`. This is useful
+an email. This simply prints the contents of the email to `sys.stdout`. This is useful
 when developing locally.
