@@ -19,7 +19,7 @@ async def post(self, request):
 
     To use the `get_messages()` within a template, your templates will need to be loaded
     via our `Jinja2Templates` loader.
-    [See docs](/templating).
+    [See docs](../templating).
 
 ```html
 <ul class="messages">
