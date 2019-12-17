@@ -88,9 +88,7 @@ class Base:
             ).limit(1)
         )
 
-        if deps:
-            return False
-        return True
+        return not deps
 
     def refresh_from_db(self) -> None:
         """ Refresh the current instance from the database """
