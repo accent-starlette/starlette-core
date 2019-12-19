@@ -20,7 +20,7 @@ templates = Jinja2Templates(
     )
 )
 
-async def home(self, request):
+async def home(request):
     template = "home.html"
     context = {"request": request}
     return templates.TemplateResponse(template, context)
