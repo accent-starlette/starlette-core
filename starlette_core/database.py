@@ -12,7 +12,7 @@ from starlette.exceptions import HTTPException
 from .middleware import get_request_id
 
 metadata = sa.MetaData()
-Session = scoped_session(sessionmaker(), scopefunc=get_request_id)
+Session = scoped_session(sessionmaker(autoflush=False), scopefunc=get_request_id)
 
 
 class BaseQuery(Query):
