@@ -53,4 +53,4 @@ def test_send_message():
     with patch("smtplib.SMTP") as mock_smtp:
         send_message(msg)
         instance = mock_smtp.return_value
-        assert 1 == instance.send_message.call_count
+        assert instance.send_message.call_count == 1
