@@ -22,11 +22,8 @@ class Paginator:
 
         if number < 1:
             raise EmptyPage("That page number is less than 1")
-        if number > self.num_pages:
-            if number == 1:
-                pass
-            else:
-                raise EmptyPage("That page contains no results")
+        if number > self.num_pages and number != 1:
+            raise EmptyPage("That page contains no results")
 
         return number
 
