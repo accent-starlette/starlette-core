@@ -1,11 +1,11 @@
-import smtplib
-import threading
 import typing
 from email.message import EmailMessage
 
+import aiosmtplib
 from starlette.datastructures import Secret
 
-from ...config import config
+from starlette_core.config import config
+
 from .base import BaseEmailBackend
 
 
@@ -31,13 +31,12 @@ class EmailBackend(BaseEmailBackend):
         self.use_tls = use_tls or config.email_use_tls
         self.timeout = timeout or config.email_timeout
         self.connection = None
-        self._lock = threading.RLock()
 
     @property
     def connection_class(self):
-        return smtplib.SMTP
+        return aiosmtplib.SMTP
 
-    def open(self):
+    async def open(self):
         """
         Ensure an open connection to the email server. Return whether or not a
         new connection was required (True or False) or None if an exception
@@ -54,21 +53,23 @@ class EmailBackend(BaseEmailBackend):
 
         try:
             self.connection = self.connection_class(
-                self.host, self.port, **connection_params
+                hostname=self.host, port=self.port, **connection_params
             )
 
+            await self.connection.connect()
+
             if self.use_tls:
-                self.connection.starttls()
+                await self.connection.starttls()
 
             if self.username and self.password:
-                self.connection.login(self.username, str(self.password))
+                await self.connection.login(self.username, str(self.password))
 
             return True
         except OSError:
             if not self.fail_silently:
                 raise
 
-    def close(self):
+    async def close(self):
         """Close the connection to the email server."""
 
         if self.connection is None:
@@ -76,20 +77,15 @@ class EmailBackend(BaseEmailBackend):
 
         try:
             try:
-                self.connection.quit()
-            except smtplib.SMTPServerDisconnected:
-                # This happens when calling quit() on a TLS connection
-                # sometimes, or when the connection was already disconnected
-                # by the server.
-                self.connection.close()
-            except smtplib.SMTPException:
+                await self.connection.quit()
+            except:
                 if self.fail_silently:
                     return
                 raise
         finally:
             self.connection = None
 
-    def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
+    async def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
         """
         Send one or more EmailMessage objects and return the number of email
         messages sent.
@@ -98,22 +94,21 @@ class EmailBackend(BaseEmailBackend):
         if not email_messages:
             return 0
 
-        with self._lock:
-            new_conn_created = self.open()
-            if not self.connection or new_conn_created is None:
-                # We failed silently on open(). Trying to send would be pointless.
-                return 0
-            num_sent = 0
-            for message in email_messages:
-                sent = self._send(message)
-                if sent:
-                    num_sent += 1
-            if new_conn_created:
-                self.close()
+        new_conn_created = await self.open()
+        if not self.connection or new_conn_created is None:
+            # We failed silently on open(). Trying to send would be pointless.
+            return 0
+        num_sent = 0
+        for message in email_messages:
+            sent = await self._send(message)
+            if sent:
+                num_sent += 1
+        if new_conn_created:
+            await self.close()
 
         return num_sent
 
-    def _send(self, email_message: EmailMessage):
+    async def _send(self, email_message: EmailMessage):
         """A helper method that does the actual sending."""
 
         if not self.connection:
@@ -121,8 +116,8 @@ class EmailBackend(BaseEmailBackend):
             return False
 
         try:
-            self.connection.send_message(email_message)
-        except smtplib.SMTPException:
+            await self.connection.send_message(email_message)
+        except:
             if not self.fail_silently:
                 raise
             return False

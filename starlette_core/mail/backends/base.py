@@ -16,7 +16,7 @@ class BaseEmailBackend:
     def __init__(self, fail_silently: bool = False, **kwargs: typing.Any) -> None:
         self.fail_silently = fail_silently
 
-    def open(self):
+    async def open(self):
         """
         Open a network connection.
         This method can be overwritten by backend implementations to open a network
@@ -30,22 +30,21 @@ class BaseEmailBackend:
         The default implementation does nothing.
         """
 
-    def close(self):
+    async def close(self):
         """Close a network connection."""
 
-    def __enter__(self):
+    async def __enter__(self):
         try:
-            self.open()
+            await self.open()
         except Exception:
-            self.close()
+            await self.close()
             raise
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
-        print("close", self)
+    async def __exit__(self, exc_type, exc_value, traceback):
+        await self.close()
 
-    def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
+    async def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
         """
         Send one or more EmailMessage objects and return the number of email
         messages sent.

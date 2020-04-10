@@ -1,5 +1,4 @@
 import sys
-import threading
 import typing
 from email.message import EmailMessage
 
@@ -12,9 +11,8 @@ class EmailBackend(BaseEmailBackend):
     def __init__(self, fail_silently: bool = False, **kwargs: typing.Any) -> None:
         super().__init__(fail_silently=fail_silently)
         self.stream = kwargs.pop("stream", sys.stdout)
-        self._lock = threading.RLock()
 
-    def write_message(self, message):
+    async def write_message(self, message):
         msg_data = message.as_bytes()
         charset = (
             message.get_charset().get_output_charset()
@@ -26,22 +24,21 @@ class EmailBackend(BaseEmailBackend):
         self.stream.write("-" * 79)
         self.stream.write("\n")
 
-    def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
+    async def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
         """ Write all messages to the stream in a thread-safe way. """
 
         if not email_messages:
             return 0
         msg_count = 0
-        with self._lock:
-            try:
-                stream_created = self.open()
-                for message in email_messages:
-                    self.write_message(message)
-                    self.stream.flush()
-                    msg_count += 1
-                if stream_created:
-                    self.close()
-            except Exception:
-                if not self.fail_silently:
-                    raise
+        try:
+            stream_created = await self.open()
+            for message in email_messages:
+                await self.write_message(message)
+                self.stream.flush()
+                msg_count += 1
+            if stream_created:
+                await self.close()
+        except Exception:
+            if not self.fail_silently:
+                raise
         return msg_count

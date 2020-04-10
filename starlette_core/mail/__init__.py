@@ -21,7 +21,7 @@ def get_connection(
     return klass(fail_silently=fail_silently, **kwds)
 
 
-def send_message(
+async def send_message(
     msg: EmailMessage,
     connection: typing.Optional[BaseEmailBackend] = None,
     fail_silently: bool = False,
@@ -34,4 +34,4 @@ def send_message(
         )
 
     connection = connection or get_connection(fail_silently=fail_silently)
-    return connection.send_messages([msg])
+    return await connection.send_messages([msg])
