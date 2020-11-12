@@ -7,6 +7,13 @@ database = Database(url)
 
 
 @pytest.fixture()
-def db():
+async def conn():
+    async with database.engine.begin() as conn:
+        yield conn
+        await conn.rollback()
+
+
+@pytest.fixture()
+async def db():
     yield database
-    database.truncate_all(force=True)
+    await database.truncate_all(force=True)

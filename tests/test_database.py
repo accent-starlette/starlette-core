@@ -1,137 +1,161 @@
 import pytest
 import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException
 
-from starlette_core.database import Base, Session
+from starlette_core.database import Base
 
 
 class User(Base):
-    name = sa.Column(sa.String(50))
+    name = sa.Column(sa.String(50), unique=True)
 
 
-def test_database(db):
+@pytest.mark.asyncio
+async def test_database(db, conn):
+
     # connects ok
-    db.engine.connect()
+    async with db.engine.begin() as conn:
 
-    # can create tables
-    db.create_all()
-    assert "user" in db.engine.table_names()
+        def tbls(conn):
+            return sa.inspect(conn).get_table_names()
 
-    # can drop tables
-    db.drop_all()
-    assert [] == db.engine.table_names()
+        # can create tables
+        await db.create_all()
+        assert "user" in await conn.run_sync(tbls)
 
-
-def test_database__truncate_of_db(db):
-    db.create_all()
-
-    user = User(name="bill")
-    user.save()
-
-    assert User.query.count() == 1
-
-    db.truncate_all(force=True)
-
-    assert User.query.count() == 0
+        # can drop tables
+        await db.drop_all()
+        assert [] == await conn.run_sync(tbls)
 
 
-def test_session(db):
-    db.create_all()
+@pytest.mark.asyncio
+async def test_database__session_usage(db, conn):
+    await db.create_all()
 
-    # basic session usage
-    user = User(name="bill")
-
-    session = Session()
-    session.add(user)
-    session.commit()
-    session.close()
-
-
-def test_declarative_base__save(db):
-    db.create_all()
-
-    user = User(name="ted")
-    user.save()
-
-    assert User.query.get(user.id) == user
+    async with AsyncSession(conn) as session:
+        user = User(name="bill")
+        async with session.begin():
+            session.add(user)
+        await session.commit()
 
 
-def test_declarative_base__delete(db):
-    db.create_all()
+@pytest.mark.asyncio
+async def test_database__session_usage_1(db, conn):
+    await db.create_all()
+
+    async with AsyncSession(conn) as session:
+        user = User(name="bill")
+        async with session.begin():
+            session.add(user)
+        await session.commit()
+
+
+@pytest.mark.asyncio
+async def test_declarative_base__save(db):
+    await db.create_all()
 
     user = User(name="ted")
-    user.save()
+    await user.save()
 
-    user.delete()
-    assert User.query.get(user.id) is None
+    qs = sa.select(User).where(User.name == "ted")
+    result = await User.session.execute(qs)
+    assert result.scalars().first() == user
 
 
-def test_declarative_base__refresh_from_db(db):
-    db.create_all()
+@pytest.mark.asyncio
+async def test_declarative_base__delete(db):
+    await db.create_all()
 
     user = User(name="ted")
-    user.save()
+    await user.save()
+
+    await user.delete()
+
+    qs = sa.select(User).where(User.name == "ted")
+    result = await User.session.execute(qs)
+    assert result.scalars().first() is None
+
+
+@pytest.mark.asyncio
+async def test_declarative_base__refresh_from_db(db):
+    await db.create_all()
+
+    user = User(name="ted")
+    await user.save()
     user.name = "sam"
 
-    user.refresh_from_db()
+    await user.refresh_from_db()
     assert user.name == "ted"
 
 
-def test_declarative_base__can_be_deleted(db):
-    class OrderA(Base):
-        user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
+# @pytest.mark.asyncio
+# async def test_declarative_base__can_be_deleted(db):
+#     class OrderA(Base):
+#         user_id = sa.Column(
+#             sa.Integer,
+#             sa.ForeignKey(User.id)
+#         )
 
-    class OrderB(Base):
-        user_id = sa.Column(
-            sa.Integer, sa.ForeignKey(User.id, ondelete="SET NULL"), nullable=True
-        )
+#     class OrderB(Base):
+#         user_id = sa.Column(
+#             sa.Integer,
+#             sa.ForeignKey(User.id, ondelete="SET NULL"),
+#             nullable=True
+#         )
 
-    class OrderC(Base):
-        user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete="CASCADE"))
+#     class OrderC(Base):
+#         user_id = sa.Column(
+#             sa.Integer,
+#             sa.ForeignKey(User.id, ondelete="CASCADE")
+#         )
 
-    class OrderD(Base):
-        user_id = sa.Column(sa.Integer, sa.ForeignKey(User.id, ondelete="RESTRICT"))
+#     class OrderD(Base):
+#         user_id = sa.Column(
+#             sa.Integer,
+#             sa.ForeignKey(User.id, ondelete="RESTRICT")
+#         )
 
-    db.create_all()
+#     await db.create_all()
 
-    user = User(name="ted")
-    user.save()
+#     user = User(name="ted")
+#     await user.save()
 
-    assert user.can_be_deleted()
+#     assert user.can_be_deleted()
 
-    # default
+#     # default
 
-    order = OrderA(user_id=user.id)
-    order.save()
-    assert not user.can_be_deleted()
+#     order = OrderA(user_id=user.id)
+#     await order.save()
+#     assert not user.can_be_deleted()
 
-    order.delete()
-    assert user.can_be_deleted()
+#     await order.delete()
+#     assert user.can_be_deleted()
 
-    # set null
+#     # set null
 
-    order = OrderB(user_id=user.id)
-    order.save()
-    assert user.can_be_deleted()
+#     order = OrderB(user_id=user.id)
+#     await order.save()
+#     assert user.can_be_deleted()
 
-    # cascade
+#     # cascade
 
-    order = OrderC(user_id=user.id)
-    order.save()
-    assert user.can_be_deleted()
+#     order = OrderC(user_id=user.id)
+#     await order.save()
+#     assert user.can_be_deleted()
 
-    # restrict
+#     # restrict
 
-    order = OrderD(user_id=user.id)
-    order.save()
-    assert not user.can_be_deleted()
+#     order = OrderD(user_id=user.id)
+#     await order.save()
+#     assert not user.can_be_deleted()
 
-    order.delete()
-    assert user.can_be_deleted()
+#     await order.delete()
+#     assert user.can_be_deleted()
 
 
-def test_declarative_base__repr(db):
-    db.create_all()
+@pytest.mark.asyncio
+async def test_declarative_base__repr(db):
+    await db.create_all()
 
     user = User()
 
@@ -140,16 +164,31 @@ def test_declarative_base__repr(db):
     assert str(user) == f"<User, id={user.id}>"
 
 
-def test_declarative_base__query(db):
-    db.create_all()
+@pytest.mark.asyncio
+async def test_declarative_base__get(db):
+    await db.create_all()
 
     user = User(name="ted")
-    user.save()
+    await user.save()
+
+    # get
+    assert await User.get(user.id) == user
+
+    # get is none
+    assert await User.get(1000) is None
+
+
+@pytest.mark.asyncio
+async def test_declarative_base__get_or_404(db):
+    await db.create_all()
+
+    user = User(name="ted")
+    await user.save()
 
     # get_or_404
-    assert User.query.get_or_404(user.id) == user
+    assert await User.get_or_404(user.id) == user
 
     # get_or_404 raises http exception when no result found
     with pytest.raises(HTTPException) as e:
-        User.query.get_or_404(1000)
+        await User.get_or_404(1000)
     assert e.value.status_code == 404

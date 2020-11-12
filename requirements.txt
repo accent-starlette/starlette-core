@@ -11,5 +11,10 @@ jinja2
 mock
 mypy
 pytest
+pytest-asyncio
 pytest-cov
 requests
+
+# example
+aiofiles
+uvicorn
