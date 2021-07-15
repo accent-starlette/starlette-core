@@ -1,11 +1,12 @@
 from html import unescape
 from os.path import dirname, join, realpath
 
+import httpx
 import jinja2
+import pytest
 from starlette.applications import Starlette
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import RedirectResponse
-from starlette.testclient import TestClient
 
 from starlette_core.messages import message
 from starlette_core.templating import Jinja2Templates
@@ -32,12 +33,15 @@ def create_app():
     return app
 
 
-def test_message_in_template():
-    with TestClient(create_app()) as client:
+@pytest.mark.anyio
+async def test_message_in_template():
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=create_app()), base_url="https://testclient"
+    ) as client:
         # a message should live between requests
-        response = client.get("/add")
+        response = await client.get("/add")
         assert """<p class="default">Hello World</p>""" in unescape(response.text)
 
-        response = client.get("/view")
+        response = await client.get("/view")
         # once a message is consumed it should be removed
         assert """<p class="default">Hello World</p>""" not in unescape(response.text)
