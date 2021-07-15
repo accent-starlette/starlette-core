@@ -17,7 +17,7 @@ Session = scoped_session(sessionmaker(autoflush=False), scopefunc=get_request_id
 
 class BaseQuery(Query):
     def get_or_404(self, ident):
-        """ performs a query.get or raises a 404 if not found """
+        """performs a query.get or raises a 404 if not found"""
 
         qs = self.get(ident)
         if not qs:
@@ -46,7 +46,7 @@ class Base:
     query: BaseQuery
 
     def save(self) -> None:
-        """ save the current instance """
+        """save the current instance"""
 
         session = Session()
 
@@ -58,7 +58,7 @@ class Base:
             raise
 
     def delete(self) -> None:
-        """ delete the current instance """
+        """delete the current instance"""
 
         session = Session()
 
@@ -91,7 +91,7 @@ class Base:
         return not deps
 
     def refresh_from_db(self) -> None:
-        """ Refresh the current instance from the database """
+        """Refresh the current instance from the database"""
 
         sa.inspect(self).session.refresh(self)
 
