@@ -33,7 +33,7 @@ class Jinja2Templates(templating.Jinja2Templates):
         def is_multipart(form: form.Form) -> bool:
             return any(isinstance(field, fields.FileField) for field in form)
 
-        @jinja2.pass_context
+        @pass_context
         def url_for(context: dict, name: str, **path_params: typing.Any) -> str:
             request = context["request"]
             return request.url_for(name, **path_params)
