@@ -69,7 +69,7 @@ setup(
         'sqlalchemy-utils',
         'starlette',
         'typing',
-        'wtforms'
+        'wtforms==2.3.3'
     ],
     extras_require={
         "docs": [
