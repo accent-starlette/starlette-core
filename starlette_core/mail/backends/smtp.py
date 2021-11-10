@@ -10,7 +10,7 @@ from .base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):
-    """ A wrapper that manages the SMTP network connection. """
+    """A wrapper that manages the SMTP network connection."""
 
     def __init__(
         self,
@@ -75,17 +75,16 @@ class EmailBackend(BaseEmailBackend):
             return
 
         try:
-            try:
-                self.connection.quit()
-            except smtplib.SMTPServerDisconnected:
-                # This happens when calling quit() on a TLS connection
-                # sometimes, or when the connection was already disconnected
-                # by the server.
-                self.connection.close()
-            except smtplib.SMTPException:
-                if self.fail_silently:
-                    return
-                raise
+            self.connection.quit()
+        except smtplib.SMTPServerDisconnected:
+            # This happens when calling quit() on a TLS connection
+            # sometimes, or when the connection was already disconnected
+            # by the server.
+            self.connection.close()
+        except smtplib.SMTPException:
+            if self.fail_silently:
+                return
+            raise
         finally:
             self.connection = None
 

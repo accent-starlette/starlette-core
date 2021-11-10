@@ -15,11 +15,11 @@ def test_database(db):
 
     # can create tables
     db.create_all()
-    assert "user" in db.engine.table_names()
+    assert "user" in sa.inspect(db.engine).get_table_names()
 
     # can drop tables
     db.drop_all()
-    assert [] == db.engine.table_names()
+    assert [] == sa.inspect(db.engine).get_table_names()
 
 
 def test_database__truncate_of_db(db):
