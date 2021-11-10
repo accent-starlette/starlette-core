@@ -1,6 +1,7 @@
+import httpx
+import pytest
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
-from starlette.testclient import TestClient
 
 from starlette_core.database import Session
 from starlette_core.middleware import DatabaseMiddleware, get_request_id
@@ -25,19 +26,22 @@ def create_app():
     return app
 
 
-def test_database_middleware(db):
-    # by not initializing it doesnt break
-    with TestClient(create_app()) as client:
-        response = client.get("/session_not_initialized")
-        json = response.json()
+@pytest.mark.anyio
+async def test_database_middleware(db):
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=create_app()), base_url="https://testclient"
+    ) as client:
+        # by not initializing it doesnt break
+        json = (await client.get("/session_not_initialized")).json()
         assert not json["has_session"]
         assert json["id"] is not None
         assert json["id"] not in Session.registry.registry
 
-    # sessions are removed after the request
-    with TestClient(create_app()) as client:
-        response = client.get("/session_initialized")
-        json = response.json()
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=create_app()), base_url="https://testclient"
+    ) as client:
+        # sessions are removed after the request
+        json = (await client.get("/session_initialized")).json()
         assert json["has_session"]
         assert json["id"] is not None
         assert json["id"] not in Session.registry.registry

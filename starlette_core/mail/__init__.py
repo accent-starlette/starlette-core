@@ -26,7 +26,7 @@ def send_message(
     connection: typing.Optional[BaseEmailBackend] = None,
     fail_silently: bool = False,
 ):
-    """ Send an ``email.message.EmailMessage``. """
+    """Send an ``email.message.EmailMessage``."""
 
     if not msg.get("From"):
         msg["From"] = email.utils.formataddr(

@@ -10,7 +10,7 @@ from .base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):
-    """ A wrapper that manages the SMTP network connection. """
+    """A wrapper that manages the SMTP network connection."""
 
     def __init__(
         self,

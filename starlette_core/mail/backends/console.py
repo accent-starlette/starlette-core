@@ -7,7 +7,7 @@ from .base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):
-    """ A wrapper that sends email to the console. """
+    """A wrapper that sends email to the console."""
 
     def __init__(self, fail_silently: bool = False, **kwargs: typing.Any) -> None:
         super().__init__(fail_silently=fail_silently)
@@ -27,7 +27,7 @@ class EmailBackend(BaseEmailBackend):
         self.stream.write("\n")
 
     def send_messages(self, email_messages: typing.List[EmailMessage]) -> int:
-        """ Write all messages to the stream in a thread-safe way. """
+        """Write all messages to the stream in a thread-safe way."""
 
         if not email_messages:
             return 0
