@@ -24,7 +24,7 @@ async def post(self, request):
 ```html
 <ul class="messages">
 {% for message in get_messages() %}
-    <li class="message-{{ message.catagory }}">{{ message.message }}</li>
+    <li class="message-{{ message.category }}">{{ message.message }}</li>
 {% endfor %}
 </ul>
 ```
