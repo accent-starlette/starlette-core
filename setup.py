@@ -65,7 +65,7 @@ setup(
     packages=get_packages(package_name),
     package_data=get_package_data(package_name),
     install_requires=[
-        'sqlalchemy',
+        'sqlalchemy<1.4',
         'sqlalchemy-utils',
         'starlette',
         'typing',
