@@ -19,7 +19,7 @@ class Jinja2Templates(templating.Jinja2Templates):
         self.env = self.get_environment(loader)
 
     def get_environment(self, loader: "jinja2.BaseLoader") -> "jinja2.Environment":
-        @jinja2.contextfunction
+        @jinja2.pass_context
         def get_request_messages(context: dict):
             request = context["request"]
             return get_messages(request)
@@ -27,7 +27,7 @@ class Jinja2Templates(templating.Jinja2Templates):
         def is_multipart(form: form.Form) -> bool:
             return any(isinstance(field, fields.FileField) for field in form)
 
-        @jinja2.contextfunction
+        @jinja2.pass_context
         def url_for(context: dict, name: str, **path_params: typing.Any) -> str:
             request = context["request"]
             return request.url_for(name, **path_params)
